@@ -47,6 +47,7 @@ void destuff()
             if(count==5)
             {
                 i++;
+                count=0;
             }
         }
     }

@@ -11,7 +11,8 @@ void division(int temp[],int gen[],int n,int r)
                  temp[k]=0;
              else
                  temp[k]=1;
-     } }}
+     } }
+}
 int main()
 {int n,r,message[50],gen[50],temp[50];
  cout<<"At Sender's End "<<endl;
@@ -40,25 +41,27 @@ int main()
  cout<<endl<<"Transmitted Message : ";
  for(int i=0;i<n+r;i++)
      cout<<message[i]<<" ";
- cout<<endl<<endl<<"At Receiver's End "<<endl;
- cout<<"Enter the received message : ";
- for(int i=0;i<n+r;i++)
-     cin>>message[i];
- for(int i=0;i<n+r;i++)
-     temp[i] = message[i];
- division(temp,gen,n,r);
- for(int i=0;i<r;i++)
- {
-     if(temp[n+i])
-     {
-         cout<<"Error detected in received message.";
-         return 0;
-     } }
- cout<<"No error in received Message.\nReceived Message : ";
- for(int i=0;i<n;i++)
-     cout<<message[i]<<" ";
+//  cout<<endl<<endl<<"At Receiver's End "<<endl;
+//  cout<<"Enter the received message : ";
+//  for(int i=0;i<n+r;i++)
+//      cin>>message[i];
+//  for(int i=0;i<n+r;i++)
+//      temp[i] = message[i];
+//  division(temp,gen,n,r);
+//  for(int i=0;i<r;i++)
+//  {
+//      if(temp[n+i])
+//      {
+//          cout<<"Error detected in received message.";
+//          return 0;
+//      } }
+//  cout<<"No error in received Message.\nReceived Message : ";
+//  for(int i=0;i<n;i++)
+//      cout<<message[i]<<" ";
  return 0;
 }
+
+
 // OUTPUT 1:
 // At Sender's End
 // Enter the number of message bits : 10
