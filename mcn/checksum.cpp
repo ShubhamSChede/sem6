@@ -2,16 +2,8 @@
 using namespace std;
 
 bool isValid(const string& s) {
-    // Check if the string has exactly 4 characters
     if (s.length() != 4)
         return false;
-
-    // Check if each character is either '0' or '1'
-    for (char c : s) {
-        if (c != '0' && c != '1')
-            return false;
-    }
-
     return true; // Passed all checks
 }
 
