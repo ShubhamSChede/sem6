@@ -23,12 +23,15 @@ int main()
  cout<<"Enter the message : ";
  for(int i=0;i<n;i++)
      cin>>message[i];
+
  cout<<"Enter the generator : ";
  for(int i=0;i<r;i++)
      cin>>gen[i];
+
  r--;
  for(int i=0;i<r;i++)
      message[n+i] = 0;
+     
  for(int i=0;i<n+r;i++)
      temp[i] = message[i];
  division(temp,gen,n,r);
