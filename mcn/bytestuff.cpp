@@ -10,7 +10,6 @@ void byteStuffing() {
     int n;
     cout << "Enter number of words: ";
     cin >> n;
-
     string word, stuffed = FLAG + " ";
     cout << "Enter words:\n";
     for (int i = 0; i < n; i++) {
