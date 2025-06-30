@@ -1,76 +1,89 @@
-from queue import PriorityQueue
-#1 2 3 7 8 4 6 0 5
+import heapq
+def manhattan(state, goal):
+    distance = 0
+    for num in '12345678':
+        i = state.index(num)
+        j = goal.index(num)
+        x1, y1 = i // 3, i % 3
+        x2, y2 = j // 3, j % 3
+        distance += abs(x1 - x2) + abs(y1 - y2)
+    return distance
+
+def get_neighbors(state):
+    moves = []
+    i = state.index('0')
+    row, col = i // 3, i % 3
+    directions = [(-1,0), (1,0), (0,-1), (0,1)] 
+
+    for dr, dc in directions:
+        new_row, new_col = row + dr, col + dc
+        if 0 <= new_row < 3 and 0 <= new_col < 3:
+            j = new_row * 3 + new_col
+            lst = list(state)
+            lst[i], lst[j] = lst[j], lst[i]
+            moves.append(''.join(lst))
+    return moves
+
 def print_state(state):
     for i in range(0, 9, 3):
-        print(state[i:i + 3])
-
-def heuristic(state, goal_state):
-    return sum(1 for i in range(9) if state[i] != goal_state[i])
-
-def move(state, direction):
-    blank_index = state.index(0)
-    new_state = list(state)
-    if direction == 'up' and blank_index > 2:
-        new_state[blank_index], new_state[blank_index - 3] = new_state[blank_index - 3], new_state[blank_index]
-    elif direction == 'down' and blank_index < 6:
-        new_state[blank_index], new_state[blank_index + 3] = new_state[blank_index + 3], new_state[blank_index]
-    elif direction == 'left' and blank_index % 3 != 0:
-        new_state[blank_index], new_state[blank_index - 1] = new_state[blank_index - 1], new_state[blank_index]
-    elif direction == 'right' and blank_index % 3 != 2:
-        new_state[blank_index], new_state[blank_index + 1] = new_state[blank_index + 1], new_state[blank_index]
-    else:
-        return None
-    return tuple(new_state)
-
-def generate_neighbors(state):
-    neighbors = []
-    directions = ['up', 'down', 'left', 'right']
-    for direction in directions:
-        neighbor = move(state, direction)
-        if neighbor is not None:
-            neighbors.append(neighbor)
-    return neighbors
-
-def solve_puzzle(initial_state, goal_state, max_steps=10):
-    current_state = initial_state
-    current_cost = heuristic(initial_state, goal_state)
-    steps = 0
-    path = [current_state]
-    print_state(current_state)
-    print("Current heuristic : ",current_cost)
+        print(state[i], state[i+1], state[i+2])
     print()
-    priority_queue = PriorityQueue()
-    priority_queue.put((current_cost, current_state))
-    
-    while not priority_queue.empty() and steps < max_steps:
-        current_cost, current_state = priority_queue.get()
-        if current_cost == 0:
-            print_state(current_state)
-            print("Current heuristic : ",current_cost)
-            print()
-            print("Goal state reached!")
-            break
-        
-        neighbors = generate_neighbors(current_state)
-        for neighbor in neighbors:
-            neighbor_cost = heuristic(neighbor, goal_state)
-            priority_queue.put((neighbor_cost, neighbor))
-        
-        if path[-1] != current_state:  # Avoid duplicate states
-            path.append(current_state)
-            print_state(current_state)
-            print("Current heuristic : ",current_cost)
-            print()
-        
-        steps += 1
 
-    if current_cost > 0:
-        print("No solution found")
+def best_first_search(start, goal):
+    queue = []
+    heapq.heappush(queue, (manhattan(start, goal), [start]))
+    visited = set()
+    step = 1
+    while queue:
+        h, path = heapq.heappop(queue)
+        state = path[-1]
+        if state in visited:
+            continue
+        visited.add(state)
+        print(f"Step {step} - Heuristic: {h}")
+        print_state(state)
+        step += 1
+        if state == goal:
+            print("Goal reached!")
+            print("Path to goal:")
+            for s in path:
+                print_state(s)
+            return
+        for neighbor in get_neighbors(state):
+            if neighbor not in visited:
+                heapq.heappush(queue, (manhattan(neighbor, goal), path + [neighbor]))
+    print("No solution found.")
+start = input("Enter initial state (use 0 for blank, space-separated): ").replace(" ", "")
+goal = input("Enter goal state (use 0 for blank, space-separated): ").replace(" ", "")
+best_first_search(start, goal)
 
-initial_state = tuple(map(int, input("Enter initial state : ").split()))
-# inu = [1, 2, 3, 4, 5, 6, 7, 8, 0]
-# random.shuffle(inu)
-# initial_state = tuple(inu)
-goal_state = (1, 2, 3, 8, 0, 4, 7, 6, 5)
+# Enter initial state (use 0 for blank, space-separated): 1 2 3 4 0 6 7 5 8
+# Enter goal state (use 0 for blank, space-separated): 1 2 3 4 5 6 7 8 0
+# Step 1 - Heuristic: 2
+# 1 2 3
+# 4 0 6
+# 7 5 8
 
-solve_puzzle(initial_state, goal_state)
+# Step 2 - Heuristic: 1
+# 1 2 3
+# 4 5 6
+# 7 0 8
+
+# Step 3 - Heuristic: 0
+# 1 2 3
+# 4 5 6
+# 7 8 0
+
+# Goal reached!
+# Path to goal:
+# 1 2 3
+# 4 0 6
+# 7 5 8
+
+# 1 2 3
+# 4 5 6
+# 7 0 8
+
+# 1 2 3
+# 4 5 6
+# 7 8 0

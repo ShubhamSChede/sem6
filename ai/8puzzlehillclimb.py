@@ -1,80 +1,102 @@
-import copy
+def print_state(state):
+    for i in range(0, 9, 3):
+        print(state[i:i+3])
+    print()
 
-goal_state = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 0]  
-]
+def heuristic(state, goal):
+    distance = 0
+    for num in range(1, 9):
+        i = state.index(num)
+        j = goal.index(num)
+        xi, yi = i // 3, i % 3
+        xj, yj = j // 3, j % 3
+        distance += abs(xi - xj) + abs(yi - yj)
+    return distance
 
-initial_state = [
-    [1, 2, 3],
-    [0, 4, 6],
-    [7, 5, 8]
-]
 
-moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-def find_blank(state):
-    for i in range(3):
-        for j in range(3):
-            if state[i][j] == 0:
-                return (i, j)
-    return None
-
-def misplaced_tiles(state):
-    count = 0
-    for i in range(3):
-        for j in range(3):
-            if state[i][j] != 0 and state[i][j] != goal_state[i][j]:
-                count += 1
-    return count
+def move(state, direction):
+    i = state.index(0)
+    new_state = list(state)
+    if direction == 'up' and i > 2:
+        new_state[i], new_state[i-3] = new_state[i-3], new_state[i]
+    elif direction == 'down' and i < 6:
+        new_state[i], new_state[i+3] = new_state[i+3], new_state[i]
+    elif direction == 'left' and i % 3 != 0:
+        new_state[i], new_state[i-1] = new_state[i-1], new_state[i]
+    elif direction == 'right' and i % 3 != 2:
+        new_state[i], new_state[i+1] = new_state[i+1], new_state[i]
+    else:
+        return None
+    return tuple(new_state)
 
 def get_neighbors(state):
-    neighbors = []
-    x, y = find_blank(state)
+    return [move(state, d) for d in ['up', 'down', 'left', 'right'] if move(state, d)]
 
-    for dx, dy in moves:
-        new_x, new_y = x + dx, y + dy
-        if 0 <= new_x < 3 and 0 <= new_y < 3:
-            new_state = copy.deepcopy(state)
-            new_state[x][y], new_state[new_x][new_y] = new_state[new_x][new_y], new_state[x][y]
-            neighbors.append(new_state)
-    return neighbors
-
-def hill_climbing(start):
+def hill_climbing(start, goal):
     current = start
-    current_h = misplaced_tiles(current)
-    path = [current]
+    h = heuristic(current, goal)
+    steps = 0
+    print("Initial State:")
+    print_state(current)
+    print("Heuristic:", h, "\n")
 
-    while True:
+    while h > 0:
         neighbors = get_neighbors(current)
-        next_state = None
-        next_h = current_h
+        best = current
+        best_h = h
 
-        for neighbor in neighbors:
-            h = misplaced_tiles(neighbor)
-            if h < next_h:
-                next_state = neighbor
-                next_h = h
+        for n in neighbors:
+            nh = heuristic(n, goal)
+            if nh < best_h:
+                best = n
+                best_h = nh
 
-        if next_state is None:
-            print("Stuck at local minimum.")
-            break
+        if best == current:
+            print("Stuck at local minimum. No solution found.")
+            return
 
-        current = next_state
-        current_h = next_h
-        path.append(current)
+        current = best
+        h = best_h
+        steps += 1
+        print(f"Step {steps}:")
+        print_state(current)
+        print("Heuristic:", h, "\n")
 
-        if current_h == 0:
-            print("Goal reached!")
-            break
+    print("Goal reached in", steps, "steps!")
 
-    print("Path:")
-    for step in path:
-        for row in step:
-            print(row)
-        print("---")
+start = tuple(map(int, input("Enter initial state (space-separated 0-8): ").split()))
+goal = tuple(map(int, input("Enter goal state (space-separated 0-8): ").split()))
 
-hill_climbing(initial_state)
+hill_climbing(start, goal)
 
+# Enter initial state (space-separated 0-8): 1 2 3 8 6 0 7 5 4
+# Enter goal state (space-separated 0-8): 1 2 3 8 0 4 7 6 5
+# Initial State:
+# (1, 2, 3)
+# (8, 6, 0)
+# (7, 5, 4)
 
+# Heuristic: 3 
+
+# Step 1:
+# (1, 2, 3)
+# (8, 6, 4)
+# (7, 5, 0)
+
+# Heuristic: 2
+
+# Step 2:
+# (1, 2, 3)
+# (8, 6, 4)
+# (7, 0, 5)
+
+# Heuristic: 1
+
+# Step 3:
+# (1, 2, 3)
+# (8, 0, 4)
+# (7, 6, 5)
+
+# Heuristic: 0
+
+# Goal reached in 3 steps!
